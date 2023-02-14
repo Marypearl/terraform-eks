@@ -9,10 +9,10 @@
 resource "aws_vpc" "tsp-vpc" {
   cidr_block = "10.0.0.0/16"
 
-  tags = map(
-    "Name", "tsp-eks-node",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
-  )
+  tags = tomap({
+    "Name" = "tsp-eks-node",
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared",
+  })
 }
 
 resource "aws_subnet" "tsp-vpc" {
@@ -23,10 +23,10 @@ resource "aws_subnet" "tsp-vpc" {
   map_public_ip_on_launch = true
   vpc_id                  = aws_vpc.tsp-vpc.id
 
-  tags = map(
-    "Name", "tsp-eks-node",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
-  )
+  tags = tomap({
+    "Name" = "tsp-eks-node",
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared",
+  })
 }
 
 resource "aws_internet_gateway" "tsp-vpc" {
