@@ -3,12 +3,12 @@
 #
 
 variable "cluster-name" {
-  default = "tha-prod-cluster"
+  default = "tsp-cluster"
   type    = string
 }
 variable "key_pair_name" {
-  default = "touch-eks"
+  default = "tspcloud"
 }
 variable "eks_node_instance_type" {
-  default = "t3.xlarge"
+  default = "t2.micro"
 }

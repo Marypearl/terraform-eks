@@ -4,8 +4,8 @@
 #  * EKS Node Group to launch worker nodes
 #
 
-resource "aws_iam_role" "tha-prod-cluster-node" {
-  name = "tha-prod-cluster-node"
+resource "aws_iam_role" "tsp-cluster-node" {
+  name = "tsp-cluster-node"
 
   assume_role_policy = <<POLICY
 {
@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "worker_autoscaling" {
 
     condition {
       test     = "StringEquals"
-      variable = "autoscaling:ResourceTag/kubernetes.io/cluster/${aws_eks_cluster.tha-prod-cluster.id}"
+      variable = "autoscaling:ResourceTag/kubernetes.io/cluster/${aws_eks_cluster.tsp-cluster.id}"
       values   = ["owned"]
     }
 
@@ -67,37 +67,37 @@ data "aws_iam_policy_document" "worker_autoscaling" {
 
 resource "aws_iam_role_policy_attachment" "workers_autoscaling" {
   policy_arn = aws_iam_policy.worker_autoscaling.arn
-  role       = aws_iam_role.tha-prod-cluster-node.name
+  role       = aws_iam_role.tsp-cluster-node.name
 }
 
 resource "aws_iam_policy" "worker_autoscaling" {
-  name_prefix = "eks-worker-autoscaling-${aws_eks_cluster.tha-prod-cluster.id}"
-  description = "EKS worker node autoscaling policy for cluster ${aws_eks_cluster.tha-prod-cluster.id}"
+  name_prefix = "eks-worker-autoscaling-${aws_eks_cluster.tsp-cluster.id}"
+  description = "EKS worker node autoscaling policy for cluster ${aws_eks_cluster.tsp-cluster.id}"
   policy      = data.aws_iam_policy_document.worker_autoscaling.json
 }
 
 
 
-resource "aws_iam_role_policy_attachment" "tha-prod-cluster-node-AmazonEKSWorkerNodePolicy" {
+resource "aws_iam_role_policy_attachment" "tsp-cluster-node-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.tha-prod-cluster-node.name
+  role       = aws_iam_role.tsp-cluster-node.name
 }
 
-resource "aws_iam_role_policy_attachment" "tha-prod-cluster-node-AmazonEKS_CNI_Policy" {
+resource "aws_iam_role_policy_attachment" "tsp-cluster-node-AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.tha-prod-cluster-node.name
+  role       = aws_iam_role.tsp-cluster-node.name
 }
 
-resource "aws_iam_role_policy_attachment" "tha-prod-cluster-node-AmazonEC2ContainerRegistryReadOnly" {
+resource "aws_iam_role_policy_attachment" "tsp-cluster-node-AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.tha-prod-cluster-node.name
+  role       = aws_iam_role.tsp-cluster-node.name
 }
 
-resource "aws_eks_node_group" "tha-prod-cluster-node-group" {
-  cluster_name    = aws_eks_cluster.tha-prod-cluster.name
-  node_group_name = "tha-prod-cluster-node-group"
-  node_role_arn   = aws_iam_role.tha-prod-cluster-node.arn
-  subnet_ids      = aws_subnet.tha-prod-vpc[*].id
+resource "aws_eks_node_group" "tsp-cluster-node-group" {
+  cluster_name    = aws_eks_cluster.tsp-cluster.name
+  node_group_name = "tsp-cluster-node-group"
+  node_role_arn   = aws_iam_role.tsp-cluster-node.arn
+  subnet_ids      = aws_subnet.tsp-vpc[*].id
   instance_types = [var.eks_node_instance_type]
   remote_access{
       ec2_ssh_key = var.key_pair_name
@@ -106,14 +106,14 @@ resource "aws_eks_node_group" "tha-prod-cluster-node-group" {
 
   scaling_config {
     desired_size = 2
-    max_size     = 100
+    max_size     = 10
     min_size     = 2
   }
 
   depends_on = [
     aws_iam_role_policy_attachment.workers_autoscaling,
-    aws_iam_role_policy_attachment.tha-prod-cluster-node-AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.tha-prod-cluster-node-AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.tha-prod-cluster-node-AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.tsp-cluster-node-AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.tsp-cluster-node-AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.tsp-cluster-node-AmazonEC2ContainerRegistryReadOnly,
   ]
 }
